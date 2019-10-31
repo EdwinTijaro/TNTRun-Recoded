@@ -56,8 +56,8 @@ public class TNTRun extends JavaPlugin {
     private HashMap<Integer, CountdownTitle> countdownTitles = new HashMap<>();
     private List<String> allowedCommands = new ArrayList<>();
     private HashMap<Player, Selection> selection = new HashMap<>();
-    private boolean needUpdate = false;
     private static WorldEditPlugin we = null;
+    private PluginUpdater pluginUpdater;
 
     public static TNTRun get() {
         return instance;
@@ -113,29 +113,10 @@ public class TNTRun extends JavaPlugin {
 
         getLogger().info("Loading config.yml...");
         getConfig().options().copyDefaults(true);
-        getConfig().options().header("Please do not delete version-configuration section otherwise it will broke the plugin!");
 
-        if(getConfig().getString("version-configuration.version") != null){
-            String ver = getConfig().getString("version-configuration.version");
-
-            if(ver.equalsIgnoreCase(getDescription().getVersion())){
-                long time = getConfig().getLong("version-configuration.time");
-                if(System.currentTimeMillis() - time > 864000000){
-                    needUpdate = true;
-                    getLogger().info("TNTRun plugin was not updated more than 10 days! Please check the spigot page if is there any new update! https://www.spigotmc.org/resources/7320/");
-                }
-            }else{
-                getConfig().set("version-configuration.version", getDescription().getVersion());
-                getConfig().set("version-configuration.time", System.currentTimeMillis());
-            }
-        }else{
-            getConfig().set("version-configuration.version", getDescription().getVersion());
-            getConfig().set("version-configuration.time", System.currentTimeMillis());
-        }
+        pluginUpdater = new PluginUpdater(this);
 
         saveConfig();
-
-
 
         type = getConfig().getBoolean("bungeemode.enabled", false) ? TNTRunType.BUNGEEARENA : TNTRunType.MULTIARENA;
 
@@ -361,6 +342,22 @@ public class TNTRun extends JavaPlugin {
         }
     }
 
+    public void sendUpdateMessage() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (player.isOp() || player.hasPermission("tntrun.update,info")) {
+                        player.sendMessage(" ");
+                        player.sendMessage("§a§lTNTRun §6A new update has come! Released on §a" + pluginUpdater.getUpdateInfo()[1]);
+                        player.sendMessage("§a§lTNTRun §6New version number/your current version §a" + pluginUpdater.getUpdateInfo()[0] + "§7/§c" + getDescription().getVersion());
+                        player.sendMessage("§a§lTNTRun §6Download update here: §ahttps://www.spigotmc.org/resources/7320/");
+                    }
+                }
+            }
+        }.runTaskLater(this, 30 * 20);
+    }
+
     public void saveArenas() {
         try {
             arenasCfg.save(are);
@@ -484,7 +481,7 @@ public class TNTRun extends JavaPlugin {
     }
 
     public boolean needUpdate() {
-        return needUpdate;
+        return pluginUpdater.needUpdate();
     }
 
     public static WorldEditPlugin getWorldEdit() {

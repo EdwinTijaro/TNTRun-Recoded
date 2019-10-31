@@ -62,18 +62,7 @@ public class Listeners implements Listener {
         if(!TNTRun.get().needUpdate())
             return;
 
-        new BukkitRunnable(){
-            @Override
-            public void run() {
-                if(!p.isOnline())
-                    return;
-
-                p.sendMessage(" ");
-                p.sendMessage(" ");
-                p.sendMessage("§c§lTNTRun §aTNTRun plugin was not updated more than 10 days! Please check the spigot page if is there any new update! https://www.spigotmc.org/resources/7320/");
-                p.sendMessage("§c§lTNTRun §aCurrent version is: §6" + TNTRun.get().getDescription().getVersion());
-            }
-        }.runTaskLater(TNTRun.get(), 30);
+        TNTRun.get().sendUpdateMessage();
     }
 
     @EventHandler
