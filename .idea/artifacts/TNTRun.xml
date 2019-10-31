@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="TNTRun">
+    <output-path>$PROJECT_DIR$/out/artifacts/TNTRun</output-path>
+    <root id="archive" name="TNTRun.jar">
+      <element id="module-output" name="TNTRun" />
+    </root>
+  </artifact>
+</component>

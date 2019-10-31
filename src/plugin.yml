@@ -1,0 +1,8 @@
+name: TNTRun
+version: 2.1.1
+author: The_TadeSK
+main: me.tade.tntrun.TNTRun
+softdepend: [Multiverse-Core, MultiWorld, Vault]
+commands:
+   tntrun:
+      aliases: [trun, tr, tntr]
