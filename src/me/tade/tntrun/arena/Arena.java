@@ -343,70 +343,16 @@ public class Arena {
     }
 
     public Material getMaterialById(int id){
-        boolean ver13 = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].contains("14");
         for(Material material : Material.values()){
-            if(ver13 && material.name().startsWith("LEGACY_")){
-                if(material.getId() == id)
-                    return material;
-            }else{
-                if(material.getId() == id)
-                    return material;
-            }
+            if(material.getId() == id)
+                return material;
         }
         return null;
     }
 
     public void changeBlock(Block block, Material material, byte data) {
-        boolean ver13 = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].contains("13");
-
-        if(ver13) {
-            CraftBlock block1 = ((CraftBlock)block);
-            block1.setTypeAndData(CraftMagicNumbers.getBlock(material, data), false);
-            return;
-        }
-
-
-        Chunk chunk = block.getWorld().getChunkAt(block.getLocation().getBlockX() >> 4, block.getLocation().getBlockZ() >> 4);
-        try {
-            Object blockPosition = null;
-            Object chandle = chunk.getClass().getMethod("getHandle").invoke(chunk);
-            Object whandle = chunk.getWorld().getClass().getMethod("getHandle").invoke(chunk.getWorld());
-
-            Class<?> blockPos = getNMSClass("BlockPosition");
-            try {
-                blockPosition = blockPos.getConstructor(new Class[]{Integer.TYPE, Integer.TYPE, Integer.TYPE}).newInstance(block.getLocation().getBlockX(), block.getLocation().getBlockY(), block.getLocation().getBlockZ());
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            }
-            Class[] params = new Class[2];
-            params[0] = blockPos;
-            params[1] = getNMSClass("IBlockData");
-            Method a = chandle.getClass().getMethod("a", params);
-            Object Idata = getNMSClass("Block").getMethod("getByCombinedId", Integer.TYPE).invoke(null, Integer.valueOf(material.getId() + (data << 12)));
-            a.invoke(chandle, blockPosition, Idata);
-
-            if (Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].contains("8"))
-                whandle.getClass().getMethod("notify", blockPos).invoke(whandle, blockPosition);
-            else {
-                whandle.getClass().getMethod("notify", new Class[]{blockPos, params[1], params[1], Integer.TYPE}).invoke(whandle, blockPosition, Idata, Idata, 2);
-            }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public Class<?> getNMSClass(String name) {
-        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-        try {
-            return Class.forName("net.minecraft.server." + version + "." + name);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
+        CraftBlock block1 = ((CraftBlock)block);
+        block1.setTypeAndData(CraftMagicNumbers.getBlock(material, data), false);
     }
 
     public void timer() {
